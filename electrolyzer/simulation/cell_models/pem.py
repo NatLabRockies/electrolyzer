@@ -42,7 +42,17 @@ class PEMCell(FromDictMixin):
     cell_area: float
     turndown_ratio: float
     max_current_density: float
-
+    # everything below is new
+    p_anode: float  # bar
+    p_cathode: float  # bar
+    alpha_a: float
+    alpha_c: float
+    i_0_a: float
+    i_0_c: float
+    e_m: float
+    R_ohmic_elec: float
+    f_1: float
+    f_2: float
     # If we rework this class to be even more generic, we can have these be specified
     # as configuration params
 
@@ -64,8 +74,8 @@ class PEMCell(FromDictMixin):
         """Calculates open circuit voltage using the Nernst equation."""
         T_K = convert_temperature([temperature], "C", "K")[0]
         E_rev_0 = self.calc_reversible_voltage()
-        p_anode = P_ATMO  # (Pa) assumed atmo
-        p_cathode = 30 * P_STD  # (Pa) 30 bars
+        p_anode = self.p_anode * P_STD  # (Pa)
+        p_cathode = self.p_cathode * P_STD  # (Pa)
 
         # noqa: E501
         # Arden Buck equation T=C, https://www.omnicalculator.com/chemistry/vapour-pressure-of-water#vapor-pressure-formulas # noqa
@@ -83,6 +93,9 @@ class PEMCell(FromDictMixin):
         p_o2 = p_anode - p_h2O_sat
 
         # General Nernst equation, 10.1016/j.ijhydene.2017.03.046
+        # E_cell = E_rev_0 + ((R * T_K) / (self.n * F)) * (
+        #     np.log((p_h2 / p_h2O_sat) * np.sqrt(p_o2 / p_h2O_sat))
+        # )
         E_cell = E_rev_0 + ((R * T_K) / (self.n * F)) * (
             np.log((p_h2 / P_ATMO) * np.sqrt(p_o2 / P_ATMO))
         )
@@ -105,20 +118,24 @@ class PEMCell(FromDictMixin):
         T_cathode = T_K  # TODO: updated with realistic anode temperature?
 
         # anode charge transfer coefficient TODO: is this a realistic value?
-        alpha_a = 2
+        # alpha_a = 2
 
         # cathode charge transfer coefficient TODO: is this a realistic value?
-        alpha_c = 0.5
+        # alpha_c = 0.5
 
         # anode exchange current density TODO: update to be f(T)?
-        i_0_a = 2e-7
+        # i_0_a = 2e-7
 
         # cathode exchange current density TODO: update to be f(T)?
-        i_0_c = 2e-3
+        # i_0_c = 2e-3
 
         # derived from Butler-Volmer eqs
-        V_act_a = ((R * T_anode) / (alpha_a * F)) * np.arcsinh(i / (2 * i_0_a))
-        V_act_c = ((R * T_cathode) / (alpha_c * F)) * np.arcsinh(i / (2 * i_0_c))
+        V_act_a = ((R * T_anode) / (self.alpha_a * F)) * np.arcsinh(
+            i / (2 * self.i_0_a)
+        )
+        V_act_c = ((R * T_cathode) / (self.alpha_c * F)) * np.arcsinh(
+            i / (2 * self.i_0_c)
+        )
 
         # alternate equations for Activation overpotential
         # Option 2: Dakota: I believe this may be more accurate, found more
@@ -144,16 +161,16 @@ class PEMCell(FromDictMixin):
         # pulled from https://www.sciencedirect.com/science/article/pii/S0360319917309278?via%3Dihub # noqa
         # TODO: pulled from empirical data, is there a better eq?
         lambda_nafion = ((-2.89556 + (0.016 * T_K)) + 1.625) / 0.1875
-        t_nafion = 0.02  # (cm) confirmed that membrane thickness is <0.02.
+        # t_nafion = 0.02  # (cm) confirmed that membrane thickness is <0.02.
 
         # TODO: confirm with Nel, is there a better eq?
         sigma_nafion = ((0.005139 * lambda_nafion) - 0.00326) * np.exp(
             1268 * ((1 / 303) - (1 / T_K))
         )
-        R_ohmic_ionic = t_nafion / sigma_nafion
+        R_ohmic_ionic = self.e_m / sigma_nafion
 
         # TODO: confirm realistic value with Nel https://www.sciencedirect.com/science/article/pii/S0378775315001901 # noqa
-        R_ohmic_elec = 50e-3
+        # R_ohmic_elec = 50e-3
 
         # Alternate R_ohmic_elec from https://www.sciencedirect.com/science/article/pii/S0360319918309017 # noqa
         # rho =  (ohm*m) material resistivity
@@ -161,7 +178,7 @@ class PEMCell(FromDictMixin):
         # A_path = (m2) cross-sectional area of conductor path
         # R_ohmic_elec = ((rho*l_path)/A_path)
 
-        V_ohmic = i * (R_ohmic_elec + R_ohmic_ionic)
+        V_ohmic = i * (self.R_ohmic_elec + R_ohmic_ionic)
 
         return V_ohmic
 
@@ -225,25 +242,24 @@ class PEMCell(FromDictMixin):
         return :: eta_F [-]: Faraday's efficiency
         Reference: https://res.mdpi.com/d_attachment/energies/energies-13-04792/article_deploy/energies-13-04792-v2.pdf
         """  # noqa
-        f_1 = 250  # (mA2/cm4)
-        f_2 = 0.996
+        # f_1 = 250  # (mA2/cm4)
+        # f_2 = 0.996
         I *= 1000
 
         eta_F = (
-            ((I / self.cell_area) ** 2) / (f_1 + ((I / self.cell_area) ** 2))
-        ) * f_2
+            ((I / self.cell_area) ** 2) / (self.f_1 + ((I / self.cell_area) ** 2))
+        ) * self.f_2
 
         return eta_F
 
-    def calc_mass_flow_rate(self, T_C, Idc, dryer_loss=6.5):
+    def calc_mass_flow_rate(self, T_C, Idc):
         """
         Idc [A]: stack current
-        dryer_loss [%]: loss of drying H2
         T_C [C]: cell temperature (currently unused)
         return :: mfr [kg/s]: mass flow rate
         """
         eta_F = self.calc_faradaic_efficiency(T_C, Idc)
-        mfr = eta_F * Idc * self.M / (self.n * F) * (1 - dryer_loss / 100.0)  # [g/s]
+        mfr = eta_F * Idc * self.M / (self.n * F)  # [g/s]
         # mfr = mfr / 1000. * 3600. # [kg/h]
         mfr = mfr / 1e3  # [kg/s]
         return mfr

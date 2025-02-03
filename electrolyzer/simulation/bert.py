@@ -71,7 +71,7 @@ def _run_electrolyzer_full(modeling_options, power_signal):
             }
         )
         stack_dfs.append(stack_df)
-
+        
     results_df = pd.concat([results_df, *stack_dfs], axis=1)
 
     return elec_sys, results_df
@@ -104,7 +104,21 @@ def _run_electrolyzer_opt(modeling_options, power_signal):
 
     return tot_kg, max_curr_density
 
-
+def run_LCA(elec_sys, plant_life_years:int):
+    sys_refurb = pd.DataFrame()
+    sys_aep = pd.DataFrame()
+    sys_ah2 = pd.DataFrame()
+    years = list(np.arange(0,plant_life_years,1))
+    for i, stack in enumerate(elec_sys.stacks):
+        id = i + 1
+        refturb_schedule,ahp_kg,aep_kWh = stack.estimate_life_performance_from_year(plant_life_years)
+        sys_refurb = pd.concat([sys_aep,pd.DataFrame(dict(zip(["Stack {}".format(id)],[aep_kWh])),index=years)])
+        sys_ah2 = pd.concat([sys_ah2,pd.DataFrame(dict(zip(["Stack {}".format(id)],[ahp_kg])),index=years)])
+        sys_refurb = pd.concat([sys_refurb,pd.DataFrame(dict(zip(["Stack {}".format(id)],[refturb_schedule])),index=years)])
+        # df_index = [[f"stack {id}"]*plant_life_years,list(np.arange(0,plant_life_years,1))]
+        # temp_df = pd.DataFrame(dict(zip(["AEP [kWh/year]","Refurb Schedule","AHP [kg/year]"],[aep_kWh,ahp_kg,refturb_schedule])),index=df_index)
+        # stack_LCA = pd.concat([stack_LCA,temp_df])
+    return {"Refurb Schedule":sys_refurb,"AEP [kWh/year]":sys_aep,"AHP [kg/year]":sys_ah2}
 def run_electrolyzer(input_modeling, power_signal, optimize=False):
     """
     Runs an electrolyzer simulation based on a YAML configuration file and power
