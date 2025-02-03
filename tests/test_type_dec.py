@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 from attrs import field, define
 
-from electrolyzer.type_dec import FromDictMixin, iter_validator, array_converter
+from electrolyzer.tools.type_dec import FromDictMixin, iter_validator, array_converter
 
 
 @define

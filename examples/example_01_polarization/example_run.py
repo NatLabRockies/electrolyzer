@@ -5,8 +5,8 @@ This example runs the Electrolyzer on its own and generates polarization curves.
 import numpy as np
 import matplotlib.pyplot as plt
 
-from electrolyzer import Stack
-from electrolyzer.PEM_cell import PEM_electrolyzer_model as electrolyzer_model
+from electrolyzer.simulation.stack import Stack
+from electrolyzer.simulation.cell_models.pem import PEM_electrolyzer_model as electrolyzer_model
 
 
 stack_dict = {

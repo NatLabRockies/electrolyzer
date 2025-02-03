@@ -6,9 +6,9 @@ files.
 import numpy as np
 import pandas as pd
 
-import electrolyzer.inputs.validation as val
-from electrolyzer import Supervisor
-from electrolyzer.glue_code.optimization import calc_rated_system
+import electrolyzer.tools.validation as val
+from electrolyzer.simulation.supervisor import Supervisor
+from electrolyzer.tools.design.optimization import calc_rated_system
 
 
 def _run_electrolyzer_full(modeling_options, power_signal):

@@ -9,9 +9,9 @@ import rainflow
 from attrs import field, define
 from scipy.signal import tf2ss, cont2discrete
 
-from electrolyzer.PEM_cell import PEMCell, PEM_electrolyzer_model
-from electrolyzer.type_dec import NDArrayFloat, FromDictMixin, array_converter
-from electrolyzer.alkaline_cell import AlkalineCell, ael_electrolyzer_model
+from electrolyzer.simulation.cell_models.pem import PEMCell, PEM_electrolyzer_model
+from electrolyzer.tools.type_dec import NDArrayFloat, FromDictMixin, array_converter
+from electrolyzer.simulation.cell_models.alkaline import AlkalineCell, ael_electrolyzer_model
 
 
 @define

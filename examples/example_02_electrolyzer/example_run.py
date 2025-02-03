@@ -7,7 +7,7 @@ import os
 
 import numpy as np
 
-from electrolyzer import run_electrolyzer
+from electrolyzer.simulation.bert import run_electrolyzer
 
 
 fname_input_modeling = os.path.join(

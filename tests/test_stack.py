@@ -4,8 +4,8 @@ import numpy as np
 import pytest
 from numpy.testing import assert_array_equal, assert_array_almost_equal
 
-from electrolyzer import Stack, PEMCell
-
+from electrolyzer.simulation.stack import Stack
+from electrolyzer.simulation.cell_models.pem import PEMCell
 
 def create_stack():
     stack_dict = {

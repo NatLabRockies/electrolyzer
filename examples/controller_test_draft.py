@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from electrolyzer import Supervisor
+from electrolyzer.simulation.supervisor import Supervisor
 
 
 # import matplotlib.pyplot as plt

@@ -4,8 +4,8 @@ from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
 
-from electrolyzer import run_electrolyzer
-from electrolyzer.inputs.validation import load_modeling_yaml
+from electrolyzer.simulation.bert import run_electrolyzer
+from electrolyzer.tools.validation import load_modeling_yaml
 
 
 # Generate a power signal to illustrate Supervisor behavior

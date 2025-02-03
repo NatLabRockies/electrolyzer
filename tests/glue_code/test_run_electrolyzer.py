@@ -10,11 +10,11 @@ from numpy.testing import (
     assert_array_almost_equal,
 )
 
-import electrolyzer.inputs.validation as val
-from electrolyzer import Supervisor, run_electrolyzer
-from electrolyzer.inputs.validation import load_modeling_yaml
-from electrolyzer.glue_code.optimization import calc_rated_system
-
+import electrolyzer.tools.validation as val
+from electrolyzer.simulation.supervisor import Supervisor
+from electrolyzer.simulation.bert import run_electrolyzer
+from electrolyzer.tools.validation import load_modeling_yaml
+from electrolyzer.tools.design.optimization import calc_rated_system
 
 turbine_rating = 3.4  # MW
 

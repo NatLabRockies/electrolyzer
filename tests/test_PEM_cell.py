@@ -2,7 +2,7 @@
 
 import pytest
 
-from electrolyzer import PEMCell
+from electrolyzer.simulation.cell_models.pem import PEMCell as Cell
 
 
 # from numpy.testing import assert_almost_equal

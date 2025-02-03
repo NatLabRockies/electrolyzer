@@ -6,7 +6,7 @@ import os
 
 import numpy as np
 
-from electrolyzer import run_lcoh
+from electrolyzer.tools.analysis.run_lcoh import run_lcoh
 
 
 fname_input_modeling = os.path.join(

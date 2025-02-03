@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 from attrs import field, define
 
-from electrolyzer.type_dec import NDArrayFloat, FromDictMixin
+from electrolyzer.tools.type_dec import NDArrayFloat, FromDictMixin
 
 
 @define

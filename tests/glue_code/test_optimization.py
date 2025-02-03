@@ -2,8 +2,8 @@ import os
 
 from numpy.testing import assert_almost_equal
 
-from electrolyzer.inputs import validation as val
-from electrolyzer.glue_code.optimization import calc_rated_stack, calc_rated_system
+import electrolyzer.tools.validation as val
+from electrolyzer.tools.design.optimization import calc_rated_stack, calc_rated_system
 
 
 input_modeling = "./test_modeling_options.yaml"

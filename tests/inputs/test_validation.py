@@ -3,7 +3,7 @@ import os
 import pytest
 from jsonschema.exceptions import ValidationError
 
-from electrolyzer.inputs.validation import load_modeling_yaml
+from electrolyzer.tools.validation import load_modeling_yaml
 
 
 def test_basic_model():

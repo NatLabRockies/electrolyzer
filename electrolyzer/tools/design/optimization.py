@@ -2,7 +2,7 @@ import copy
 
 from scipy.optimize import fsolve
 
-from electrolyzer import Stack
+from electrolyzer.simulation.stack import Stack
 
 
 def calc_rated_system(modeling_options: dict):

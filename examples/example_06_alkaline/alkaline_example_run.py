@@ -8,7 +8,7 @@ import os
 import numpy as np
 
 # from electrolyzer import run_alkaline as run_electrolyzer
-from electrolyzer import run_electrolyzer
+from electrolyzer.simulation.bert import run_electrolyzer
 
 
 # the alkaline system is 20 5 kW stacks for an overall system rating of 1 MW

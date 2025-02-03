@@ -6,10 +6,11 @@ files.
 import numpy as np
 import pandas as pd
 
-import electrolyzer.inputs.validation as val
-from electrolyzer import LCOH, Supervisor  # ESG
-from electrolyzer.glue_code.optimization import calc_rated_system
-from electrolyzer.glue_code.run_electrolyzer import _run_electrolyzer_full
+import electrolyzer.tools.validation as val
+from electrolyzer.simulation.supervisor import Supervisor  # ESG
+from electrolyzer.tools.design.optimization import calc_rated_system
+from electrolyzer.simulation.bert import _run_electrolyzer_full
+from electrolyzer.tools.analysis.lcoh import LCOH
 
 
 def _run_electrolyzer_lcoh_opt(modeling_options, power_signal):

@@ -12,7 +12,7 @@ import numpy as np
 from attrs import define
 from scipy.constants import R, physical_constants, convert_temperature
 
-from electrolyzer.type_dec import FromDictMixin
+from electrolyzer.tools.type_dec import FromDictMixin
 
 
 def PEM_electrolyzer_model(X, a, b, c, d, e, f):

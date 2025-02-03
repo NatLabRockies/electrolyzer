@@ -3,7 +3,7 @@
 import pytest
 from numpy.testing import assert_almost_equal
 
-from electrolyzer import PEMCell as Cell
+from electrolyzer.simulation.cell_models.pem import PEMCell as Cell
 
 
 @pytest.fixture
