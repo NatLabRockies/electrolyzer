@@ -9,14 +9,42 @@ from electrolyzer import PEMCell as Cell
 @pytest.fixture
 def cell():
     return Cell.from_dict(
-        {"cell_area": 1000, "turndown_ratio": 0.1, "max_current_density": 2}
+        {
+            "cell_area": 1000,
+            "turndown_ratio": 0.1,
+            "max_current_density": 2,
+            "p_anode": 1.01325,
+            "p_cathode": 30,
+            "alpha_a": 2,
+            "alpha_c": 0.5,
+            "i_0_a": 2.0e-7,
+            "i_0_c": 2.0e-3,
+            "e_m": 0.02,
+            "R_ohmic_elec": 50.0e-3,
+            "f_1": 250,
+            "f_2": 0.996,
+        }
     )
 
 
 def test_init():
     """`Cell` should initialize properly from a Dictionary."""
     cell = Cell.from_dict(
-        {"cell_area": 1000, "turndown_ratio": 0.1, "max_current_density": 2}
+        {
+            "cell_area": 1000,
+            "turndown_ratio": 0.1,
+            "max_current_density": 2,
+            "p_anode": 1.01325,
+            "p_cathode": 30,
+            "alpha_a": 2,
+            "alpha_c": 0.5,
+            "i_0_a": 2.0e-7,
+            "i_0_c": 2.0e-3,
+            "e_m": 0.02,
+            "R_ohmic_elec": 50.0e-3,
+            "f_1": 250,
+            "f_2": 0.996,
+        }
     )
 
     assert cell.cell_area == 1000
@@ -25,6 +53,17 @@ def test_init():
     assert cell.M == 2.016  # molecular weight [g/mol]
     assert cell.lhv == 33.33  # lower heating value of H2 [kWh/kg]
     assert cell.hhv == 39.41  # higher heating value of H2 [kWh/kg]
+    # assert cell.p_anode ==1
+    assert cell.p_anode == 1.01325
+    assert cell.p_cathode == 30
+    assert cell.alpha_a == 2
+    assert cell.alpha_c == 0.5
+    assert cell.i_0_a == 2.0e-7
+    assert cell.i_0_c == 2.0e-3
+    assert cell.e_m == 0.02
+    assert cell.R_ohmic_elec == 50.0e-3
+    assert cell.f_1 == 250
+    assert cell.f_2 == 0.996
 
 
 def test_calc_reversible_voltage(cell: Cell):

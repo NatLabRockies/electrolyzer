@@ -200,12 +200,12 @@ properties:
 
             cell_params:
                 type: object
-                default:
-                    cell_type: PEM
-                    max_current_density: 2
-                    PEM_params:
-                        cell_area: 1000
-                        turndown_ratio: 0.1
+                default: {}
+                #     cell_type: PEM
+                #     max_current_density: 2
+                #     PEM_params:
+                #         cell_area: 1000
+                #         turndown_ratio: 0.1
                 description: Cell parameters for PEM or alkaline cells
                 properties:
                     cell_type:
@@ -214,14 +214,16 @@ properties:
                         description: Cell electrochemistry (PEM, alkaline, or other)
                     PEM_params:
                         type: object
-                        default:
-                            cell_area: 1001
-                            turndown_ratio: 0.1
-                            max_current_density: 2
+                        default: {}
+                        #     cell_area: 1001
+                        #     turndown_ratio: 0.1
+                        #     max_current_density: 2
                         description: PEM cell parameters
                         properties:
                             cell_area:
                                 type: number
+                                minimum: 1
+                                maximum: 10000
                                 default: 1000
                                 description: Area of individual Cells in the Stack (cm^2)
                                 unit: cm^2
@@ -233,9 +235,82 @@ properties:
                                 description: Minimum operating power as a fraction of rated power
                             max_current_density:
                                 type: number
+                                minimum: 1.5
+                                maximum: 6
                                 default: 2
                                 units: A/cm^2
                                 description: Maximum current density
+                            p_anode:
+                                type: number
+                                minimum: 1
+                                maximum: 30
+                                default: 1.01325
+                                units: bar
+                                description: anode pressure
+                            p_cathode:
+                                type: number
+                                minimum: 1
+                                maximum: 30
+                                default: 30
+                                units: bar
+                                description: cathode pressure
+                            alpha_a:
+                                type: number
+                                minimum: 0
+                                maximum: 4
+                                default: 2
+                                units: none
+                                description: anode charge transfer coefficient
+                            alpha_c:
+                                type: number
+                                minimum: 0
+                                maximum: 4
+                                default: 0.5
+                                units: none
+                                description: cathode charge transfer coefficient
+                            i_0_a:
+                                type: number
+                                minimum: 0
+                                maximum: 1
+                                default: 2.0e-7
+                                units: A/cm^2
+                                description: anode exchange current density
+                            i_0_c:
+                                type: number
+                                minimum: 0
+                                maximum: 1
+                                default: 2.0e-3
+                                units: A/cm^2
+                                description: cathode exchange current density
+                            e_m:
+                                type: number
+                                minimum: 0.002
+                                maximum: 0.08
+                                default: 0.02
+                                units: cm
+                                description: membrane thickness
+                            R_ohmic_elec:
+                                type: number
+                                minimum: 0
+                                maximum: 1
+                                default: 50.0e-3
+                                units: A*cm^2
+                                description: electrolyte resistance
+                            f_1:
+                                type: number
+                                minimum: 150
+                                maximum: 400
+                                default: 250
+                                units: mA^2/cm^4
+                                description: faradaic coefficient
+                            f_2:
+                                type: number
+                                minimum: 0.5
+                                maximum: 1.0
+                                default: 0.996
+                                units: none
+                                description: faradaic coefficient
+
                     ALK_params:
                         type: object
                         default: {}
@@ -260,35 +335,66 @@ properties:
                                 type: number
                                 units: A/cm^2
                                 description: Maximum current density
+                            f_1:
+                                type: number
+                                minimum: 150
+                                maximum: 400
+                                default: 250
+                                units: mA^2/cm^4
+                                description: faradaic coefficient
+                            f_2:
+                                type: number
+                                minimum: 0.5
+                                maximum: 1.0
+                                default: 0.96
+                                units: none
+                                description: faradaic coefficient
+                            cell_area:
+                                type: number
+                                # minimum: 1
+                                # maximum: 10000
+                                default: 300
+                                description: Area of individual Cells in the Stack (cm^2)
+                                unit: cm^2
                             electrode:
                                 type: object
                                 default: {}
                                 description: Alkaline electrode parameters
                                 properties:
-                                    A_electrode:
-                                        type: number
-                                        default: 300
-                                        description: electrode total area
-                                        units: cm^2
-                                    e_a:
+                                    # A_electrode:
+                                    #     type: number
+                                    #     default: 300
+                                    #     description: electrode total area
+                                    #     units: cm^2
+                                    # e_a:
+                                    #     type: number
+                                    #     default: 0.2
+                                    #     description: anode thickness
+                                    #     units: cm
+                                    # e_c:
+                                    #     type: number
+                                    #     default: 0.2
+                                    #     description: cathode thickness
+                                    #     units: cm
+                                    e_e:
                                         type: number
                                         default: 0.2
-                                        description: anode thickness
+                                        description: electrode thickness
                                         units: cm
-                                    e_c:
-                                        type: number
-                                        default: 0.2
-                                        description: cathode thickness
-                                        units: cm
-                                    d_am:
+                                    # d_am:
+                                    #     type: number
+                                    #     default: 0.125
+                                    #     description: anode-membrane distance
+                                    #     units: cm
+                                    # d_cm:
+                                    #     type: number
+                                    #     default: 0.125
+                                    #     description: cathode-membrane distance
+                                    #     units: cm
+                                    d_em:
                                         type: number
                                         default: 0.125
-                                        description: anode-membrane distance
-                                        units: cm
-                                    d_cm:
-                                        type: number
-                                        default: 0.125
-                                        description: cathode-membrane distance
+                                        description: electrode-membrane distance
                                         units: cm
                                     d_ac:
                                         type: number
@@ -312,11 +418,11 @@ properties:
                                 default: {}
                                 description: Alkaline membrane parameters
                                 properties:
-                                    A_membrane:
-                                        type: number
-                                        default: 300
-                                        units: cm^2
-                                        description: membrane surface area
+                                    # A_membrane:
+                                    #     type: number
+                                    #     default: 300
+                                    #     units: cm^2
+                                    #     description: membrane surface area
                                     e_m:
                                         type: number
                                         default: 0.05
