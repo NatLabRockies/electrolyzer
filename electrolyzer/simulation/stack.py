@@ -13,6 +13,9 @@ from electrolyzer.simulation.cell_models.pem import PEMCell, PEM_electrolyzer_mo
 from electrolyzer.tools.type_dec import NDArrayFloat, FromDictMixin, array_converter
 from electrolyzer.simulation.cell_models.alkaline import AlkalineCell, ael_electrolyzer_model
 from electrolyzer.tools.validators import contains
+from scipy.constants import R, physical_constants
+
+F, _, _ = physical_constants["Faraday constant"]  # Faraday's constant [C/mol]
 
 @define
 class Stack(FromDictMixin):
