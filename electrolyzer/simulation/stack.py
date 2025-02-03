@@ -12,14 +12,14 @@ from scipy.signal import tf2ss, cont2discrete
 from electrolyzer.simulation.cell_models.pem import PEMCell, PEM_electrolyzer_model
 from electrolyzer.tools.type_dec import NDArrayFloat, FromDictMixin, array_converter
 from electrolyzer.simulation.cell_models.alkaline import AlkalineCell, ael_electrolyzer_model
-
+from electrolyzer.tools.validators import contains
 
 @define
 class Stack(FromDictMixin):
     # Stack parameters #
     ####################
     dt: float = field()
-    cell_type: str = field()
+    cell_type: str = field(validator=contains(["PEM","alkaline"]))
     temperature: float = field()
     n_cells: int = field()
 
