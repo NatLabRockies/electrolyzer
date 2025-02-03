@@ -16,6 +16,7 @@ def create_stack():
         "n_cells": 100,
         # "stack_rating_kW": 750,
         "degradation": {
+            "eol_eff_percent_loss": 10,
             "PEM_params": {
                 "rate_steady": 1.41737929e-10,
                 "rate_fatigue": 3.33330244e-07,
@@ -66,6 +67,7 @@ def test_init(mocker):
         "n_cells": 100,
         "stack_rating_kW": 750,
         "degradation": {
+            "eol_eff_percent_loss": 10,
             "PEM_params": {
                 "rate_steady": 1.41737929e-10,
                 "rate_fatigue": 3.33330244e-07,
@@ -468,6 +470,7 @@ def test_dt_behavior():
         "n_cells": 100,
         # "stack_rating_kW": 750,
         "degradation": {
+            "eol_eff_percent_loss": 10,
             "PEM_params": {
                 "rate_steady": 1.41737929e-10,
                 "rate_fatigue": 3.33330244e-07,
