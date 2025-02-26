@@ -7,6 +7,7 @@ from numpy.testing import assert_array_equal, assert_array_almost_equal
 from electrolyzer.simulation.stack import Stack
 from electrolyzer.simulation.cell_models.pem import PEMCell
 
+
 def create_stack():
     stack_dict = {
         "dt": 1,
@@ -21,7 +22,7 @@ def create_stack():
                 "rate_steady": 1.41737929e-10,
                 "rate_fatigue": 3.33330244e-07,
                 "rate_onoff": 1.47821515e-04,
-            }
+            },
         },
         "cell_params": {
             "cell_type": "PEM",
@@ -72,7 +73,7 @@ def test_init(mocker):
                 "rate_steady": 1.41737929e-10,
                 "rate_fatigue": 3.33330244e-07,
                 "rate_onoff": 1.47821515e-04,
-            }
+            },
         },
         "cell_params": {
             "cell_type": "PEM",
@@ -108,7 +109,9 @@ def test_init(mocker):
     assert stack.min_power == 0.1 * stack.stack_rating
 
     assert stack.include_degradation_penalty is True
-    assert stack.hydrogen_degradation_penalty == stack_dict["hydrogen_degradation_penalty"]
+    assert (
+        stack.hydrogen_degradation_penalty == stack_dict["hydrogen_degradation_penalty"]
+    )
     assert stack.rf_track == 0.0
     assert stack.V_degradation == 0.0
     assert stack.uptime == 0.0
@@ -475,7 +478,7 @@ def test_dt_behavior():
                 "rate_steady": 1.41737929e-10,
                 "rate_fatigue": 3.33330244e-07,
                 "rate_onoff": 1.47821515e-04,
-            }
+            },
         },
         "cell_params": {
             "cell_type": "PEM",
