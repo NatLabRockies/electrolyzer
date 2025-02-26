@@ -1,9 +1,9 @@
-from abc import ABC, abstractmethod
-from typing import Any, Dict, Final
+from typing import Any, Dict
 
 import attrs
 
 from electrolyzer.tools.type_dec import FromDictMixin
+
 
 class BaseClass(FromDictMixin):
     """
@@ -28,6 +28,7 @@ class BaseClass(FromDictMixin):
         Returns
         -------
         dict
-            The provided or default, if no input provided, model settings as a dictionary.
+            The provided or default, if no input provided,
+            model settings as a dictionary.
         """
         return attrs.asdict(self)
