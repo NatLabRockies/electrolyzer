@@ -1,12 +1,89 @@
 [build-system]
-requires = ["setuptools >= 40.6.0", "wheel"]
+requires = ["setuptools >= 40.6.0", "wheel","setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 
+[project]
+name = "electrolyzer"
+dynamic = ["version"]
+authors = [{name = "NREL", email = "christopher.bay@nrel.gov"}]
+readme = {file = "README.md", content-type = "text/markdown"}
+description = "A controls-oriented engineering electrolyzer model."
+requires-python = ">=3.9, <3.12"
+license = {file = "LICENSE"}
+dependencies = [
+    "numpy",
+    "scipy",
+    "matplotlib",
+    "pandas",
+    "matplotlib",
+    "rainflow",
+    "attrs",
+    "jsonschema",
+    "ruamel.yaml",
+]
+keywords = [
+    "electrolyzer",
+    "hydrogen",
+]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+]
+
+[project.optional-dependencies]
+develop = [
+    "pytest",
+    "pytest-subtests",
+    "pytest-dependency",
+    "pre-commit",
+    "pytest_mock",
+    "responses",
+    "jupyter-book",
+    "readthedocs-sphinx-ext",
+    "Sphinx",
+    "sphinxcontrib-napoleon",
+]
+examples = ["jupyterlab"]
+all = ["electrolyzer[develop,examples]"]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = [
+    "electrolyzer",
+    "electrolyzer/tools/modeling_schema.yaml",
+    "electrolyzer/*",
+    "library/*.yaml",
+]
+
+[tool.setuptools.dynamic]
+version = {attr = "electrolyzer.__version__"}
+
+[tool.coverage.run]
+# Coverage.py configuration file
+# https://coverage.readthedocs.io/en/latest/config.html
+branch = true
+source = ["electrolyzer/*"]
+omit = [
+  "setup.py",
+  "tests/*"
+]
+
 [tool.pytest.ini_options]
-testpaths = "tests"
-filterwarnings = [
-    "ignore::DeprecationWarning:pandas.*:"
+python_files = [
+  "tests/*.py",
+]
+testpaths = [
+  "test/*.py",
+  "test/glue_code/*.py",
 ]
 
 

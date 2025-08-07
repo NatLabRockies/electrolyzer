@@ -1,0 +1,67 @@
+# Book settings
+# Learn more at https://jupyterbook.org/customize/config.html
+
+title: Electrolyzer
+author: National Renewable Energy Laboratory
+# logo: logo.png
+copyright: "2025"
+only_build_toc_files: false
+# exclude_patterns: [_build, Thumbs.db, .DS_Store, "**.ipynb_checkpoints", .github]
+
+# Force re-execution of notebooks on each build.
+# See https://jupyterbook.org/content/execute.html
+execute:
+  execute:
+  execute_notebooks: auto
+  timeout: -1  # better for longer running notebooks
+  merge_streams: true  # keeps unsynchronized cell outputs in a single output cell
+  exclude_patterns:
+    - _build
+    - Thumbs.db
+    - DS_Store
+    - "**.ipynb_checkpoints"
+
+# Define the name of the latex output file for PDF builds
+latex:
+  latex_documents:
+    targetname: book.tex
+
+# Information about where the book exists on the web
+repository:
+  url: https://github.com/NREL/electrolyzer
+  path_to_book: docs
+  branch: main
+
+# Add GitHub buttons to your book
+# See https://jupyterbook.org/customize/config.html#add-a-link-to-your-repository
+html:
+  use_issues_button: true
+  use_repository_button: true
+  baseurl: https://nrel.github.io/electrolyzer/
+
+sphinx:
+  extra_extensions:
+  - "sphinx.ext.autodoc"
+  - "sphinx.ext.autosummary"
+  - "sphinx.ext.napoleon"
+
+  config:
+    language: 'python'
+    autosummary_generate: true
+    autodoc_default_options:
+      members: true
+      member-order: bysource
+      undoc-members: true
+      private-members: true
+      # special-members: true
+      # inherited-members
+      # show-inheritance
+      # ignore-module-all
+      # imported-members: true
+      # exclude-members
+      # class-doc-from
+      # no-value
+    autodoc_typehints: description
+    napoleon_use_admonition_for_notes: true
+    napoleon_use_rtype: false
+    nb_merge_streams: true
