@@ -217,8 +217,17 @@ class Stack(FromDictMixin):
         self.d_eol = self.calc_end_of_life_voltage()
 
     def run_power_deg_penalty(self, P_in):
-        """
-        P_in [Wdc]: stack power input
+        """Run the stack with a degradation penalty applied to the power consumption.
+        Power consumed may be greater than power input.
+
+        Args:
+            P_in (float): stack power input in Wdc
+
+        Returns:
+            2-element tuple containing
+
+            - **I_stack** (float): stack current in Amps
+            - **V_cell** (float): cell voltage in Volts
         """
 
         I_stack = self.electrolyzer_model(
@@ -229,8 +238,17 @@ class Stack(FromDictMixin):
         return I_stack, V_cell
 
     def run_h2_deg_penalty(self, P_in):
-        """
-        P_in [Wdc]: stack power input
+        """Run the stack with a degradation penalty applied to the hydrogen production.
+        Power consumed should be nearly equal to power input.
+
+        Args:
+            P_in (float): stack power input in Wdc
+
+        Returns:
+            2-element tuple containing
+
+            - **I_stack** (float): stack current in Amps
+            - **V_cell** (float): cell voltage in Volts
         """
 
         I_nom = self.electrolyzer_model(
@@ -243,6 +261,19 @@ class Stack(FromDictMixin):
         return I_stack, V_cell
 
     def run(self, P_in):
+        """Run the stack for smoe input power.
+
+        Args:
+            P_in (float): stack power input in Wdc
+
+        Returns:
+            3-element tuple containing
+
+            - **H2_mfr** (float): hydrogen mass flow rate in kg/sec
+            - **H2_mass_out** (float): hydrogen mass produced in kg/dt
+            - **power_left** (float): remaining power, P_in and power consumed
+
+        """
         self.update_status()
         if self.hydrogen_degradation_penalty:
             I_stack, V_cell = self.run_h2_deg_penalty(P_in)
@@ -253,13 +284,20 @@ class Stack(FromDictMixin):
         return H2_mfr, H2_mass_out, power_left
 
     def run_stack(self, I_stack, V_cell, P_in):
-        """
-        I_stack [A]: stack current input
-        V_cell [V]: cell voltage
-        P_in [Wdc]: stack power input
-        return :: H2_mfr [kg/s]: hydrogen mass flow rate
-        return :: H2_mass_out [kg]: hydrogen mass
-        return :: power_left [W]: difference in P_in and power consumed
+        """Run the stack for a given stack current, cell voltage, and power input.
+        Updates the cell degradation, updates dynamics, calculates hydrogen mass
+        flow rate and production, and remaining power.
+
+        Args:
+            I_stack (float): stack current input in Amps
+            V_cell (float): cell voltage in Volts
+            P_in (float): stack power input in Wdc
+        Returns:
+            3-element tuple containing
+
+            - **H2_mfr** (float): hydrogen mass flow rate in kg/sec
+            - **H2_mass_out** (float): hydrogen mass produced in kg/dt
+            - **power_left** (float): difference in P_in and power consumed in Watts
         """
 
         if self.stack_on:
@@ -347,25 +385,37 @@ class Stack(FromDictMixin):
         return fitobj
 
     def convert_power_to_current(self, Pdc, T):
-        """
-        Pdc [kW]: stack power
-        T [degC]: stack temperature
-        return :: Idc [A]: stack current
+        """Estimate stack current for a given power operating point and temperature.
+
+        Args:
+            Pdc (float): stack power in kWdc
+            T (float): stack temperature in Celsius
+
+        Returns:
+            float: ``Idc`` stack current in Amps
         """
         Idc = self.electrolyzer_model((Pdc, T), *self.fit_params)
         return Idc
 
     def curtail_power(self, P_in):
-        """
-        P_in [kWdc]: input power
-        Curtail power if over electrolyzer rating:
+        """Curtail power if power exceeds stack rating
+
+        Args:
+            P_in (float): input power in kWdc
+
+        Returns:
+            float | array: input power in kWdc saturated at stack rated power.
         """
         return np.where(P_in > self.stack_rating_kW, self.stack_rating_kW, P_in)
 
     def calc_fatigue_degradation(self, voltage_signal):
         """
-        voltage_signal: the voltage signal from the last 3600 seconds
-        return:: voltage_penalty: the degradation penalty
+        Args:
+            voltage_signal (float | array): the voltage signal from the last
+            3600 seconds
+        Returns:
+            float | array: ``voltage_penalty`` the degradation penalty from
+            variable operation in Volts
         """
         # based off degradation due to square waves of different frequencies
         # from results in https://iopscience.iop.org/article/10.1149/2.0231915jes
@@ -429,13 +479,18 @@ class Stack(FromDictMixin):
         return self.temperature
 
     def update_dynamics(self, H2_mfr_ss, stack_state):
-        """
-        H2_mfr_ss: steady state mass flow rate
-        stack_state: previous mfr state
-        return :: next_state: next mfr state
-        return :: H2_mfr_actual: actual mfr according to the filter
+        """This is really just a filter on the steady state mfr from
+        time step to time step.
 
-        This is really just a filter on the steady state mfr from time step to time step
+        Args:
+            H2_mfr_ss (float): steady state mass flow rate
+            stack_state (float): previous mfr state
+
+        Returns:
+            2-element tuple containing
+
+            - **next_state** (float): next mfr state
+            - **H2_mfr_actual** (float): actual mfr according to the filter
         """
 
         if self.ignore_dynamics:
@@ -492,6 +547,9 @@ class Stack(FromDictMixin):
             )
 
     def turn_stack_on(self):
+        """Turn the stack on if the stack is off or watiting.
+        Updates the waiting period, turn on time, and stack status.
+        """
         if self.stack_on:
             return
 
