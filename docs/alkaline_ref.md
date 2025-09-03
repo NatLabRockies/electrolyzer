@@ -3,7 +3,7 @@
 
 
 2. [Gambou, Guilbert,et al 2022](https://www.mdpi.com/1996-1073/15/9/3452)
-    "A Comprehensive Survey of Alkaline Eelctrolyzer Modeling: Electrical
+    "A Comprehensive Survey of Alkaline Electrolyzer Modeling: Electrical
     Domain and Specific Electrolyte Conductivity"
 
 
@@ -68,6 +68,6 @@ by Phillip Haug, Motthias Koj, Thomas Turek [2017]
 
 
 12. [Vogt,Balzer 2005](https://www.sciencedirect.com/science/article/pii/S001346860400948X?via%3Dihub)
-"The bubble coverage of gas-evolving elecrodes in stagnant electrolytes"
+"The bubble coverage of gas-evolving electrodes in stagnant electrolytes"
 by H. Vogt and R.J. Balzer
 Volume 50, Issue 10, 15 March 2005, Pages 2073-2079
