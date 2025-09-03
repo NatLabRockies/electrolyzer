@@ -115,7 +115,7 @@ def run_LCA(elec_sys, plant_life_years: int):
         refturb_schedule, ahp_kg, aep_kWh = stack.estimate_life_performance_from_year(
             plant_life_years
         )
-        sys_refurb = pd.concat(
+        sys_aep = pd.concat(
             [
                 sys_aep,
                 pd.DataFrame(
