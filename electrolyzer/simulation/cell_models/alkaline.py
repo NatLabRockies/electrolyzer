@@ -15,6 +15,7 @@ from attrs import field, define
 from scipy.constants import R, physical_constants, convert_temperature
 
 from electrolyzer.tools.type_dec import FromDictMixin
+from electrolyzer.tools.validators import range_val
 
 
 warnings.filterwarnings("ignore")
@@ -51,11 +52,10 @@ class AlkalineCell(FromDictMixin):
     turndown_ratio: float
     max_current_density: float
 
-    f_1: float  # faradaic coefficient
-    f_2: float  # faradaic coefficient
+    f_1: float  # faradaic coefficient in mA^2/cm^4
+    f_2: float = field(validator=range_val(0, 1))  # faradaic coefficient [unitless]
 
-    # cell_area: float = field(init=False)
-    cell_area: float = field(init=False)
+    cell_area: float = field(init=False)  # cell area in cm^2
 
     # Electrode parameters #
     ####################
@@ -99,12 +99,12 @@ class AlkalineCell(FromDictMixin):
 
         # Electrode parameters #
         ########################
-        self.e_a = self.electrode["e_e"]
-        self.e_c = self.electrode["e_e"]
+        self.e_a = self.electrode["e_e"]  # anode thickness
+        self.e_c = self.electrode["e_e"]  # cathode thickness
 
-        self.d_am = self.electrode["d_em"]
-        self.d_cm = self.electrode["d_em"]
-        self.d_ac = self.electrode["d_ac"]
+        self.d_am = self.electrode["d_em"]  # anode-membrane distance
+        self.d_cm = self.electrode["d_em"]  # cathode-membrane distance
+        self.d_ac = self.electrode["d_ac"]  # distance between electrodes
 
         # Electrolyte parameters #
         ##########################
@@ -376,22 +376,12 @@ class AlkalineCell(FromDictMixin):
         # Eqn 21 - effective resistance of electrode
         rho_nickle_eff = rho_nickle_0 / ((1 - epsilon_Ni) ** 1.5)
         # Eqn 20 - resistivity of anode
-        # Ra = (
-        #     rho_nickle_eff
-        #     * (self.e_a / self.A_electrode)
-        #     * (1 + (temp_coeff * (T_C - tref)))
-        # )
         Ra = (
             rho_nickle_eff
             * (self.e_a / self.cell_area)
             * (1 + (temp_coeff * (T_C - tref)))
         )
         # Eqn 20 - resistivity of cathode
-        # Rc = (
-        #     rho_nickle_eff
-        #     * (self.e_c / self.A_electrode)
-        #     * (1 + (temp_coeff * (T_C - tref)))
-        # )
         Rc = (
             rho_nickle_eff
             * (self.e_c / self.cell_area)
@@ -440,10 +430,6 @@ class AlkalineCell(FromDictMixin):
 
         # R_ele_bf: Bubble-free electrolyte resistance
         # Eqn 32 of [Gambou, Guilbert,et al 2022] and Eqn 19 of [Henou, Agbossou, 2014]
-
-        # R_ele_bf = (100 / sigma_bf) * (
-        #     (self.d_am / self.A_electrode) + (self.d_cm / self.A_electrode)
-        # )
         R_ele_bf = (100 / sigma_bf) * (
             (self.d_am / self.cell_area) + (self.d_cm / self.cell_area)
         )
@@ -453,7 +439,6 @@ class AlkalineCell(FromDictMixin):
         # Resistance due to bubbles
         theta_epsilon = self.calculate_bubble_rate_coverage(T_C, I)
         epsilon = theta_epsilon[1]
-        # R_ele_b=R_ele_bf*((1/(1-epsilon)**(3/2))-1)
         # R_ele_b: Bubble resistance
         R_ele_b = R_ele_bf * ((1 / ((1 - epsilon) ** (3 / 2))) - 1)
         # ^Bruggman equation
@@ -470,7 +455,7 @@ class AlkalineCell(FromDictMixin):
         Reference:
         [Gambou, Guilbert,et al 2022]: Eqn 36
         [Henou, Agbossou, 2014]: Eqn 21
-        [NEL]: TODO add slide
+        [NEL]: TODO add reference to slide
         """
 
         # NOTE: THIS HAS BEEN VERIFIED
@@ -479,9 +464,7 @@ class AlkalineCell(FromDictMixin):
         # [Gambou, Guilbert,et al 2022]
         # S_mem=54.48 # membrane surface area in cm^2
 
-        # Rmem = (0.06 + 80 * np.exp(T_C / 50)) / (
-        #     10000 * self.A_membrane
-        # )  # Equation 36 - Ohms
+        # Equation 36 - Ohms
         Rmem = (0.06 + 80 * np.exp(T_C / 50)) / (
             10000 * self.cell_area
         )  # Equation 36 - Ohms
@@ -543,31 +526,6 @@ class AlkalineCell(FromDictMixin):
         """
         return self.gibbs / (self.z * F)
 
-    # def calc_open_circuit_voltage(self, T_C):
-    #     """
-    #     I [A]: current
-    #     T_C [C]: temperature
-    #     return :: E_rev0 [V/cell]: open-circuit voltage
-
-    #     TODO: Are we correcting for temperature twice? U_rev0 should be just 1.229 and
-    #     never change (possibly?)
-
-    #     Reference: [Gambou, Guilbert,et al 2022]: Eqn 14
-    #     """
-    #     # General Nerst Equation
-    #     # Eqn 14 of [Gambou, Guilbert,et al 2022]
-    #     T_K = convert_temperature([T_C], "C", "K")[0]
-    #     E_rev0 = (
-    #         1.5184
-    #         - (1.5421 * (10 ** (-3)) * T_K)
-    #         + (9.523 * (10 ** (-5)) * T_K * np.log(T_K))
-    #         + (9.84 * (10 ** (-8)) * (T_K**2))
-    #     )
-    #     # OR should this just be 1.229?
-    #     # E_rev_fake = 1.229
-
-    #     return E_rev0
-
     def calc_faradaic_efficiency(self, T_C, I):
         """
         I [A]: current
@@ -602,10 +560,9 @@ class AlkalineCell(FromDictMixin):
 
         eta_F = self.calc_faradaic_efficiency(T_C, I)
         # Eqn 10 [mol/sec]
-        h2_prod_mol = eta_F * I / (self.z * F)
+        h2_prod_mol = eta_F * I / (self.z * F)  # mol/s
         mfr = self.M_H * self.z * h2_prod_mol  # [g/sec]
         # z is valency number of electrons transferred per ion
         # for oxygen, z=4
         mfr = mfr / 1e3  # [kg/sec]
         return mfr
-        # h2_prod is in mol/s

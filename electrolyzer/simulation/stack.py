@@ -463,6 +463,9 @@ class Stack(FromDictMixin):
         return [ss_d[0], ss_d[1], ss_d[2], ss_d[3]]
 
     def update_status(self):
+        """Update the stack status if the stack is waiting. If the stack is waiting
+        and has waited long enough to be on, this method updates the stack status to on.
+        """
         # Change the stack to be truly on if it has waited long enough
         if self.stack_on:
             return
@@ -473,6 +476,9 @@ class Stack(FromDictMixin):
                 self.stack_on = True
 
     def turn_stack_off(self):
+        """Turn the stack off if the stack is on or watiting.
+        Updates the cycle count, waiting period, turn off time, and stack status.
+        """
         if self.stack_on or self.stack_waiting:
             # record turn off time to adjust waiting period
             self.turn_off_time = self.time
@@ -506,9 +512,11 @@ class Stack(FromDictMixin):
     def calc_stack_power(self, Idc, V=None):
         """
         Args:
-            Idc [A]: stack current
-            V (optional): stack voltage
-            return :: Pdc [kW]: stack power
+            Idc (float): stack current in Amps
+            V (float, optional): stack voltage
+
+        Returns:
+            float: ``Pdc`` [kW] stack power
         """
         V = V or (self.cell.calc_cell_voltage(Idc, self.temperature))
         Pdc = Idc * V * self.n_cells
@@ -517,10 +525,18 @@ class Stack(FromDictMixin):
         return Pdc
 
     def calc_electrolysis_efficiency(self, Pdc, mfr):
-        """
-        Pdc [kW]: stack power
-        mfr [kg/h]: mass flow rate
-        return :: eta_kWh_per_kg, eta_hhv_percent, and eta_lhv_percent: efficiencies
+        """Calculate the efficiency of the stack in kWh/kg, %-HHV and %-LHV.
+
+        Args:
+            Pdc (float): stack power in kW
+            mfr (float): mass flow rate of hydrogen in kg/hr
+
+        Returns:
+            3-element tuple containing
+
+            - **eta_kWh_per_kg**: efficiency in kWh/kg
+            - **eta_hhv_percent**: efficiency as %-HHV
+            - **eta_lhv_percent**: efficiency as %-LHV
         """
         eta_kWh_per_kg = Pdc / mfr
         eta_hhv_percent = self.cell.hhv / eta_kWh_per_kg * 100.0
@@ -529,10 +545,14 @@ class Stack(FromDictMixin):
         return (eta_kWh_per_kg, eta_hhv_percent, eta_lhv_percent)
 
     def calc_end_of_life_voltage(self):
+        """Calculate the end-of-life cell degradation voltage based on the
+        ``eol_eff_percent_loss`` parameter.
+
+        Returns:
+            d_eol (float): cell degradation in Volts that indicates end-of-life.
         """
-        eol_eff_percent_loss [%]: efficiency drop that indicates end-of-life
-        (between 1 and 100)
-        """
+
+        # efficiency drop that indicates end-of-life as a percentage
         eol_eff_mult = (100 + self.eol_eff_percent_loss) / 100
         V_cell_bol = self.cell.calc_cell_voltage(self.max_current, self.temperature)
         H2_mfr_bol = (
@@ -555,6 +575,14 @@ class Stack(FromDictMixin):
         return d_eol
 
     def estimate_time_until_replacement(self):
+        """Estimate the time until replacement based on fraction of life used,
+        which is the ratio of the stack degradation to the end of life degradation.
+
+        Returns:
+            float: Number of hours until stack should be replaced with respect to
+            simulation duration (alternatively, with respect to the number of
+            hours the stack has existed in the plant.)
+        """
 
         frac_of_life_used = self.V_degradation / self.d_eol
         # time between replacement [hrs] based on time its existed (whether on or off)
@@ -562,13 +590,40 @@ class Stack(FromDictMixin):
         return time_between_replacement
 
     def estimate_stack_life(self):
+        """Estimate the stack life based on fraction of life used, which is the ratio
+        of the stack degradation to the end of life degradation.
+
+        Returns:
+            float: Stack life in hours with respect to number of hours the stack has
+            been operational.
+        """
         # stack life [hrs] based on time its been operational
         frac_of_life_used = self.V_degradation / self.d_eol
         stack_life = (1 / frac_of_life_used) * (self.uptime / 3600)  # [hrs]
         return stack_life
 
     def estimate_life_performance_from_year(self, plant_life_years: int):
-        refturb_schedule = np.zeros(plant_life_years)
+        """Estimate future performance of the stack assuming the
+        same operation from the simulation for the duration of the plant life.
+
+        Note:
+            This function is not tested and may only work for simulations
+            with an hourly timestep and a simulation length of 8760 hours.
+
+        Args:
+            plant_life_years (int): number of years in the plant life.
+
+        Returns:
+            3-element tuple containing
+
+            - **refurb_schedule** (list): refurbishment schedule of the stack,
+                a value of 1 represents a year that the stack has to be replaced.
+            - **ahp_kg** (list): annual hydrogen production of the stack per year
+                of the ``plant_life_years``. Each element has units of kg-H2/year
+            - **aep_kWh** (list): annual energy consumption of the stack per year
+                of the ``plant_life_years``. Each element has units of kWh/year.
+        """
+        refurb_schedule = np.zeros(plant_life_years)
         ahp_kg = np.zeros(plant_life_years)
         aep_kWh = np.zeros(plant_life_years)
 
@@ -584,7 +639,7 @@ class Stack(FromDictMixin):
                 V_deg_pr_sim = np.concatenate(
                     [V_deg_pr_sim[0:idx_dead], V_deg[idx_dead:sim_length]]
                 )
-                refturb_schedule[i] = 1
+                refurb_schedule[i] = 1
             if self.hydrogen_degradation_penalty:
                 I_nom = self.electrolyzer_model(
                     (self.power_input_history / 1e3, self.temperature), *self.fit_params
@@ -608,4 +663,4 @@ class Stack(FromDictMixin):
             ahp_kg[i] = np.sum(H2_mass_out)
             aep_kWh[i] = np.sum(power_usage_kW)
             Vdeg0 = V_deg_pr_sim[sim_length - 1]
-        return refturb_schedule, ahp_kg, aep_kWh
+        return refurb_schedule, ahp_kg, aep_kWh

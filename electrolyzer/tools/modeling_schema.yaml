@@ -134,7 +134,7 @@ properties:
                     hydrogen_degradation_penalty:
                         type: boolean
                         default: True
-                        description: Toggle whether degradation is applied to hydrogen or power
+                        description: Toggle whether degradation is applied to hydrogen (True) or power (False)
 
             degradation:
                 type: object
@@ -361,36 +361,11 @@ properties:
                                 default: {}
                                 description: Alkaline electrode parameters
                                 properties:
-                                    # A_electrode:
-                                    #     type: number
-                                    #     default: 300
-                                    #     description: electrode total area
-                                    #     units: cm^2
-                                    # e_a:
-                                    #     type: number
-                                    #     default: 0.2
-                                    #     description: anode thickness
-                                    #     units: cm
-                                    # e_c:
-                                    #     type: number
-                                    #     default: 0.2
-                                    #     description: cathode thickness
-                                    #     units: cm
                                     e_e:
                                         type: number
                                         default: 0.2
                                         description: electrode thickness
                                         units: cm
-                                    # d_am:
-                                    #     type: number
-                                    #     default: 0.125
-                                    #     description: anode-membrane distance
-                                    #     units: cm
-                                    # d_cm:
-                                    #     type: number
-                                    #     default: 0.125
-                                    #     description: cathode-membrane distance
-                                    #     units: cm
                                     d_em:
                                         type: number
                                         default: 0.125
@@ -418,11 +393,6 @@ properties:
                                 default: {}
                                 description: Alkaline membrane parameters
                                 properties:
-                                    # A_membrane:
-                                    #     type: number
-                                    #     default: 300
-                                    #     units: cm^2
-                                    #     description: membrane surface area
                                     e_m:
                                         type: number
                                         default: 0.05
