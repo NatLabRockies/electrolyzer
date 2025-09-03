@@ -577,7 +577,7 @@ class Stack(FromDictMixin):
         return stack_life
 
     def estimate_life_performance_from_year(self, plant_life_years: int):
-        refturb_schedule = np.zeros(plant_life_years)
+        refurb_schedule = np.zeros(plant_life_years)
         ahp_kg = np.zeros(plant_life_years)
         aep_kWh = np.zeros(plant_life_years)
 
@@ -593,7 +593,8 @@ class Stack(FromDictMixin):
                 V_deg_pr_sim = np.concatenate(
                     [V_deg_pr_sim[0:idx_dead], V_deg[idx_dead:sim_length]]
                 )
-                refturb_schedule[i] = 1
+                refurb_schedule[i] = 1
+
             if self.hydrogen_degradation_penalty:
                 I_nom = self.electrolyzer_model(
                     (self.power_input_history / 1e3, self.temperature), *self.fit_params
@@ -617,4 +618,5 @@ class Stack(FromDictMixin):
             ahp_kg[i] = np.sum(H2_mass_out)
             aep_kWh[i] = np.sum(power_usage_kW)
             Vdeg0 = V_deg_pr_sim[sim_length - 1]
-        return refturb_schedule, ahp_kg, aep_kWh
+
+        return refurb_schedule, ahp_kg, aep_kWh
