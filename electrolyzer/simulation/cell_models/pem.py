@@ -51,8 +51,8 @@ class PEMCell(FromDictMixin):
     i_0_c: float
     e_m: float
     R_ohmic_elec: float
-    f_1: float
-    f_2: float
+    f_1: float  # faradaic coefficient in mA^2/cm^4
+    f_2: float  # faradaic coefficient [unitless]
     # If we rework this class to be even more generic, we can have these be specified
     # as configuration params
 
@@ -242,8 +242,7 @@ class PEMCell(FromDictMixin):
         return :: eta_F [-]: Faraday's efficiency
         Reference: https://res.mdpi.com/d_attachment/energies/energies-13-04792/article_deploy/energies-13-04792-v2.pdf
         """  # noqa
-        # f_1 = 250  # (mA2/cm4)
-        # f_2 = 0.996
+
         I *= 1000
 
         eta_F = (
