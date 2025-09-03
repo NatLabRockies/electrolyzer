@@ -51,15 +51,14 @@ class AlkalineCell(FromDictMixin):
     turndown_ratio: float
     max_current_density: float
 
-    f_1: float
-    f_2: float
+    f_1: float  # faradaic coefficient
+    f_2: float  # faradaic coefficient
 
     # cell_area: float = field(init=False)
     cell_area: float = field(init=False)
 
     # Electrode parameters #
     ####################
-    # A_electrode: float = field(init=False)  # [cm^2]
     e_a: float = field(init=False)  # [cm] anode thickness
     e_c: float = field(init=False)  # [cm] cathode thickness
     d_am: float = field(init=False)  # [cm] Anode-membrane gap
@@ -77,7 +76,6 @@ class AlkalineCell(FromDictMixin):
 
     # Membrane parameters #
     ####################
-    # A_membrane: float = field(init=False)  # [cm^2]
     e_m: float = field(init=False)  # [cm] membrane thickness
 
     # THIS ONE IS PRIMARLY BASED ON
@@ -101,14 +99,8 @@ class AlkalineCell(FromDictMixin):
 
         # Electrode parameters #
         ########################
-        # self.A_electrode = self.electrode["A_electrode"]
-        # self.e_a = self.electrode["e_a"]
-        # self.e_c = self.electrode["e_c"]
         self.e_a = self.electrode["e_e"]
         self.e_c = self.electrode["e_e"]
-
-        # self.d_am = self.electrode["d_am"]
-        # self.d_cm = self.electrode["d_cm"]
 
         self.d_am = self.electrode["d_em"]
         self.d_cm = self.electrode["d_em"]
@@ -120,7 +112,6 @@ class AlkalineCell(FromDictMixin):
 
         # Membrane parameters #
         #######################
-        # self.A_membrane = self.membrane["A_membrane"]
         self.e_m = self.membrane["e_m"]
 
         # calcluate molarity and molality of KOH solution
@@ -147,7 +138,6 @@ class AlkalineCell(FromDictMixin):
         T_k = convert_temperature([T_C], "C", "K")[0]
         J_lim = 30  # [A/cm^2] [Vogt,Balzer 2005]
         T_amb = T_k = convert_temperature([25], "C", "K")[0]
-        # j = I / self.A_electrode  # [A/cm^2] "nominal current density"
         j = I / self.cell_area  # [A/cm^2] "nominal current density"
 
         # Eqn 19 of [Gambou, Guilbert,et al 2022]

@@ -213,8 +213,6 @@ class Stack(FromDictMixin):
             ]
         )
 
-        # self.h2_pres_out = 31  # H2 outlet pressure (bar)
-
         self.DTSS = self.calc_state_space()
         self.d_eol = self.calc_end_of_life_voltage()
 
@@ -239,9 +237,7 @@ class Stack(FromDictMixin):
             (P_in / 1e3, self.temperature), *self.fit_params
         )
         V_cell = self.cell.calc_cell_voltage(I_nom, self.temperature)
-        eff_mult = np.nan_to_num(
-            (V_cell + self.V_degradation) / V_cell
-        )  # 1 + efficiency drop
+        eff_mult = np.nan_to_num((V_cell + self.V_degradation) / V_cell)
         I_stack = np.nan_to_num(I_nom / eff_mult)
 
         return I_stack, V_cell
@@ -265,10 +261,6 @@ class Stack(FromDictMixin):
         return :: H2_mass_out [kg]: hydrogen mass
         return :: power_left [W]: difference in P_in and power consumed
         """
-        # self.update_status()
-
-        # I = self.electrolyzer_model((P_in / 1e3, self.temperature), *self.fit_params)
-        # V = self.cell.calc_cell_voltage(I, self.temperature)
 
         if self.stack_on:
             power_left = P_in
@@ -487,7 +479,6 @@ class Stack(FromDictMixin):
             self.stack_on = False
             self.stack_waiting = False
             self.cycle_count += 1
-            # self.stack_state = 0
 
             # adjust waiting period
             self.wait_time = np.max(
