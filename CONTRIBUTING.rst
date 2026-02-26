@@ -120,3 +120,8 @@ Then run::
 $ bump2version patch # possible: major / minor / patch
 $ git push
 $ git push --tags
+
+This will trigger the publishing to Test PyPI. If the action runs unsucessfully, then
+delete the tag from local and remote, restore the old version number, fix the issue, and
+try again. If the action runs successfully, then simply create the release on the github
+to trigger the publishing to PyPI.
