@@ -49,6 +49,7 @@ develop = [
     "jupyter-book",
     "sphinxcontrib-napoleon",
     "readthedocs-sphinx-ext",
+    "bump2version",
 ]
 examples = ["jupyterlab"]
 all = ["electrolyzer[develop,examples]"]
