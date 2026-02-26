@@ -69,7 +69,6 @@ Ready to contribute? Here's how to set up ``electrolyzer`` for local development
     $ cd electrolyzer
     $ python -m venv env
     $ source env/bin/activate
-    $ pip install -r requirements.txt
     $ pip install -e .
     $ pre-commit install
 
