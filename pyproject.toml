@@ -21,6 +21,7 @@ dependencies = [
     "attrs",
     "jsonschema",
     "ruamel.yaml",
+    "openmdao",
 ]
 keywords = [
     "electrolyzer",
@@ -39,16 +40,19 @@ classifiers = [
 
 [project.optional-dependencies]
 develop = [
-    "pytest",
+    "pytest>=9",
     "pytest-subtests",
     "pytest-dependency",
     "pre-commit",
     "pytest_mock",
     "responses",
-    "jupyter-book",
+    "jupyter-book<2",
     "readthedocs-sphinx-ext",
-    "Sphinx",
+    "ruff",
+    "sphinx",
     "sphinxcontrib-napoleon",
+    "isort",
+    "networkx",
 ]
 examples = ["jupyterlab"]
 all = ["electrolyzer[develop,examples]"]
@@ -87,29 +91,8 @@ testpaths = [
 ]
 
 
-[tool.black]
-line-length = 88
-target-version = ["py37", "py38", "py39"]
-include = '\.pyi?$'
-extend-exclude = '''
-/(
-    \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | _build
-  | buck-out
-  | build
-  | dist
-  | docs
-)/
-'''
-
-
 [tool.isort]
 multi_line_output = 3
-ensure_newline_before_comments = true
 sections = [
     "FUTURE",
     "STDLIB",
@@ -130,4 +113,99 @@ include_trailing_comma = true
 use_parentheses = true
 length_sort = true
 lines_after_imports = 2
-line_length = 88
+line_length = 100
+
+
+
+[tool.ruff]
+src = ["electrolyzer", "tests"]
+line-length = 100
+target-version = "py311"
+fix = true
+exclude = [
+  ".git",
+  "__pycache__",
+  "old",
+  "build",
+  "dist",
+  ".ruff_cache",
+]
+
+[tool.ruff.lint]
+fixable = ["ALL"]
+unfixable = []
+
+# https://docs.astral.sh/ruff/rules/
+select = [
+  "F",
+  "E",
+  "W",
+  # "N",  # TODO: renaming needs to be seriously cleaned up prior to using
+  "C4",
+  # "D",  # leave out until rebrand/refactor
+  "UP",
+  "BLE",
+  # "FBT",  # TODO: consider alongside rebrand/refactor
+  "B",
+  "A",
+  "LOG",
+  "G",
+  # "PT",  # TODO: very tedious for now
+  "NPY",
+  "PD",
+  "PTH",
+  "PERF",
+  "Q",
+  "FURB",
+  "RUF",
+]
+
+ignore = [
+  "E731",
+  "E402",
+  "D202",
+  "D205",
+  "D212",
+  "D401",
+  "PERF203",
+  "PD011",
+  "PD901",
+  "RUF015",
+  "N806",  # NOTE: many variable names use an uppercase for legitimate reasons
+  "N802",  # NOTE: many function names use an uppercase for legitimate reasons
+  "B905",
+
+  # TODO: People who wrote warnings should decide on the appropriate stacklevel
+  "B028",
+
+  # TODO: People responsible for these errors will need to fix them accordingly as they are bugs
+  "B006",
+  "B008",
+  "B023",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"*/__init__.py" = ["E501", "D104", "F401"]
+"test/*" = ["D100", "D101", "D102", "D103"]
+
+[tool.ruff.lint.pycodestyle]
+ignore-overlong-task-comments = true
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.isort]
+known-third-party = ["pytest"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+docstring-code-format = true
+
+[tool.yamlfix]
+allow_duplicate_keys = true
+line_length = 120
+none_representation = "null"
+explicit_start = false
+# quote_representation = '"'  # NOTE: uncomment when issue is resolved: https://github.com/lyz-code/yamlfix/issues/252
+sequence_style = "keep_style"
