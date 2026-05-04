@@ -1,6 +1,6 @@
 from attrs import field, define, validators
 
-from electrolyzer.tools.validators import range_val
+from electrolyzer.tools.validators import contains, range_val
 from electrolyzer.components.cell.cell import CellBaseClass, CellBaseConfig
 
 
@@ -12,6 +12,16 @@ class PEMCellConfig(CellBaseConfig):
     i_0c: float = field(default=2.0e-3, validator=range_val(0.0, 1.0))
     alpha_a: float = field(default=2.0, validator=range_val(0.0, 4.0))
     alpha_c: float = field(default=0.5, validator=range_val(0.0, 4.0))
+
+    water_vaporization_method: str = field(
+        default="buck", converter=(str.lower, str.strip), validator=contains(["buck", "antoine"])
+    )
+    activation_method: str = field(
+        default="arcsinh", validator=contains(["ln", "log10", "arcsinh"])
+    )
+    Urev0_calc_method: str = field(
+        default="normal", validator=contains(["normal", "temp_adjusted"])
+    )
 
 
 class PEMCell(CellBaseClass):
