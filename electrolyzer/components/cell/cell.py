@@ -1,12 +1,15 @@
 import openmdao.api as om
 
 
-class StackBaseClass(om.ExplicitComponent):
+class CellBaseClass(om.ExplicitComponent):
     def initialize(self):
         self.options.declare("plant_config", types=dict)
         self.options.declare("tech_config", types=dict)
 
     def setup(self):
+        self.n_timesteps = self.options["plant_config"]["simulation"]["n_timesteps"]
+        self.dt = self.options["plant_config"]["simulation"]["dt"]
+
         # design variables
         self.add_input("cell_active_area", units="A/(cm**2)")
         self.add_input("membrane_thickness", units="cm")
@@ -20,10 +23,10 @@ class StackBaseClass(om.ExplicitComponent):
 
         # output profiles
         self.add_output("cell_voltage")
-        self.add_output("h2_produced")
-        self.add_output("o2_produced")
-        self.add_output("h2o_consumed")
-        self.add_output("h2_production_rate")
+        self.add_output("hydrogen_produced")
+        self.add_output("oxygen_produced")
+        self.add_output("water_consumed")
+        self.add_output("hydrogen_production_rate")
 
         # output design variables
 
