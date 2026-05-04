@@ -28,8 +28,11 @@ includes levelized cost of hydrogen (LCOH) analysis utilities.
 
 Python 3.11+ is required.
 
+Create conda environment:
+
 ```bash
-pip install .
+conda create --name bert python=3.11 -y
+conda activate bert
 ```
 
 Optional extras:
